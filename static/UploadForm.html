@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Форма завантаження нотаток</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px; /*зовнішні відступі з усіх сторін */
+        }
+        h1 {
+            text-align: center;
+            color: black;
+        }
+        form {
+            max-width: 400px; 
+            margin: 0 auto; /*автоматичний відступ зліва і справа */
+        }
+        label {
+            display: block; /*робить блочним елементом */
+            /*займає всю доступну горизонтальну ширину і розташовується на окремому рядку */
+            margin-top: 10px; 
+            font-weight: bold;
+        }
+        input[type="text"], 
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid grey;
+            border-radius: 5px; /*радіус заокруглення кутів рамки */
+            margin-bottom: 10px;
+        }
+        input[type="submit"], 
+        button {
+            background-color: blue;
+            color: white; /*колір тексту на кнопках */
+            padding: 10px 15px; /*внутрішні відступи для кнопок та полів вводу*/
+            border-radius: 5px;
+            border: none;
+            cursor: pointer; /* появляється ручка коли наводися*/
+        }
+        input[type="submit"]:hover, /* */
+        button:hover { /* */
+            background-color: #0056b3;
+        }
+        #getNotesButton, #getNoteButton, #updateNoteButton, #deleteNoteButton { /* */
+            margin-top: 10px;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Форма завантаження нотаток</h1>
+    <form action="/upload" method="post" enctype="application/x-www-form-urlencoded" id="noteForm"> <!--enctype - тип кодування даних-->
+        <label for="note_name">Назва нотатки:</label>
+        <input type="text" name="note_name" id="note_name" required><br> <!--required - обовязковий для заповнення-->
+
+        <label for="note">Текст нотатки:</label>
+        <textarea name="note" id="note" rows="4"></textarea><br>
+
+        <input type="submit" value="Зберегти нотатку">
+    </form>
+
+    <button id="getNotesButton" onclick="getNotes()">Отримати усі нотатки</button>
+    <div id="notesList"></div>
+
+    <label for="getNoteName">Отримати нотатку за назвою:</label>
+    <input type="text" id="getNoteName">
+    <button id="getNoteButton">Отримати нотатку</button><br>
+
+    <label for="Newnote">Текст нової нотатки:</label>
+    <textarea name="Newnote" id="Newnote" rows="4"></textarea><br>
+
+    <button id="updateNoteButton" onclick="updateNote()">Змінити нотатку</button>
+    <button id="deleteNoteButton" onclick="deleteNote()">Видалити нотатку</button>
+    
+    <div id="errorMessage"></div>
+</body>
+
+<script>
+    document.getElementById('noteForm').addEventListener('submit', function (e) { // посилається на noteForm і при натисканні на кнопку виконує функцію
+        e.preventDefault(); // щоб не переводило на нову форму
+        const noteName = document.getElementById('note_name').value;
+        const note = document.getElementById('note').value;
+
+        fetch('/upload', { // адреса куди буде відправлено запит
+            method: 'POST', // метод, який використовується
+            headers: { // заголовок запиту
+                'Content-Type': 'application/json' // вказаний формат json
+            },
+            // визначає тіло запиту, яке буде надіслано на сервер
+            body: JSON.stringify({
+                note_name: noteName, // те шо ввів користувач
+                note: note // те шо ввів користувач
+            })
+        })
+        // обробка відповіді від сервера
+        .then(response => {
+            if (response.status === 201) { // 201 - created successfully
+                alert('нотатка фест.');
+                document.getElementById('note_name').value = ''; // очищуються рядки 
+                document.getElementById('note').value = ''; // очищуються рядки 
+            } else if (response.status === 404){
+                alert('Помилка завантаження нотатки.');
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const getNotesButton = document.getElementById("getNotesButton"); // посилання на кнопку
+        const notesList = document.getElementById("notesList");// посилання на кнопку
+
+        function getNotes() {
+            fetch("/notes") // адреса куди відправлено запит 
+                .then((response) => response.json()) // перетворює відповідь у формат json
+                .then((data) => { 
+                    if (data.length === 0) { // перевірка на наявність чогось
+                        notesList.textContent = "пусто";
+                    } else {
+                        notesList.textContent = JSON.stringify(data, null, 2); // виведення даних на сторінку
+
+                    }
+                })
+                .catch((error) => {
+                    console.error("Помилка при отриманні нотаток:", error);
+                });
+        }
+        
+        function getNote() {
+    const noteName = document.getElementById('getNoteName').value; // отримуємо значення що ввів користувач
+    const notesList = document.getElementById('notesList');  // торимуємо посилання на елемент
+    const errorMessage = document.getElementById('errorMessage');// торимуємо посилання на елемент
+
+    if (noteName.trim() === '') {
+        // Виведення повідомлення про порожню назву
+        errorMessage.textContent = 'Будь ласка, введіть назву нотатки.';
+        notesList.textContent = ''; // Очистити вміст, якщо поле назви нотатки порожнє
+    } else {
+        errorMessage.textContent = ''; // Очистити повідомлення про помилку, якщо назва нотатки не порожня
+        fetch(`/notes/${noteName}`)// відправляємо запит на сервер
+            .then((response) => { // обробка відповіді
+                if (response.status === 200) { // 200 - ОК
+                    return response.text();
+                } else if (response.status === 404) {
+                    notesList.textContent = 'німа нотатки';
+                } else {
+                    alert('Помилка завантаження нотатки.');
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    notesList.textContent = data; // встановлення тексту як вмісту notesList
+                }
+            })
+            .catch((error) => {
+                console.error('Помилка при отриманні нотатки:', error);
+            });
+    }
+}
+
+        getNotesButton.addEventListener("click", getNotes);
+        document.getElementById('getNoteButton').addEventListener('click', getNote);
+    });
+
+    function updateNote() {
+            const noteName = document.getElementById('getNoteName').value; // отримано значення
+            const newNoteText = document.getElementById('Newnote').value; // отримано значення 
+            const errorMessage = document.getElementById('errorMessage'); // посилання на елемент сторінки, який 
+            // буде використовуватися для відображення повідомлень про помилки користувачеві
+
+            if (noteName.trim() === '') { // перевірка чи пуста навзва нотатки
+                errorMessage.textContent = 'Введіть назву нотатки';
+            } else {
+                errorMessage.textContent = ''; // Очистити повідомлення про помилку, якщо назва нотатки не порожня
+                fetch(`/notes/${noteName}`, {
+                    method: 'PUT', // Використовуємо HTTP PUT-запит
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        note: newNoteText // Відправляємо новий текст нотатки
+                    })
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        alert('Нотатку оновлено.');
+                        getNotes(); // Оновимо список нотаток після оновлення
+                    } else if (response.status === 404) {
+                        errorMessage.textContent = 'німа нотатки';
+                    } else {
+                        alert('Помилка при оновленні');
+                    }
+                });
+            }
+        }
+        function deleteNote() {
+        const noteName = document.getElementById('getNoteName').value; //отримано значення
+        const errorMessage = document.getElementById('errorMessage'); // посилання на елемент сторінки, який 
+            // буде використовуватися для відображення повідомлень про помилки користувачеві
+
+        if (noteName.trim() === '') {  // перевірка чи пуста навзва нотатки
+            errorMessage.textContent = 'Введіть назву нотатки';
+        } else {
+            errorMessage.textContent = ''; // Очистити повідомлення про помилку, якщо назва нотатки не порожня
+            fetch(`/notes/${noteName}`, {
+                method: 'DELETE', // Використовуємо HTTP DELETE-запит
+            })
+            .then(response => {
+                if (response.status === 200) { // ОК
+                    alert('Нотатку видалено.');
+                    getNotes(); // Оновимо список нотаток після видалення
+                } else if (response.status === 404) {
+                    errorMessage.textContent = 'німа нотатки';
+                } else {
+                    alert('Помилка при видаленні ');
+                }
+            });
+        }
+    }
+</script>
+</html>

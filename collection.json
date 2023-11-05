@@ -1,0 +1,64 @@
+{
+	"info": {
+		"_postman_id": "4849552e-480c-42a3-8f5b-6f202ac102a3",
+		"name": "My Service API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "30939825"
+	},
+	"item": [
+		{
+			"name": "GET /notes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "UploadForm.html",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "post/upload",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "get/notes/mynotes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "put/notes/mynotes",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "delete/notes/mynotes",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8000"
+			},
+			"response": []
+		}
+	]
+}
