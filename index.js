@@ -1,17 +1,18 @@
 const express = require('express');
-// const fs = require('fs');
-const fs = require('fs').promises;
+const fs = require('fs');
+const multer = require('multer');
 const app = express();
 const port = 8000;
 
+
+app.use(multer().none()) // обробляє запити без вкладених файлів
 app.use(express.json()); // Для парсингу JSON
-app.use(express.urlencoded({ extended: true })); // Для розширеного парсингу об'єктів запиту
 app.use(express.static('static')); // Вказуємо, що файли з папки 'static' мають бути доступні
 
 // app.get('/', (req, res) => {
 //   res.sendFile(__dirname + '/static/UploadForm.html'); // Повертаємо файл UploadForm.html
 // });
-
+const notes = [];
 app.get('/', (req, res) => {
   res.send('Сервіс запущено. Вітаємо!');
 });
@@ -21,125 +22,70 @@ app.get('/UploadForm.html', (req, res) => {
 });
 
   // Оновлений GET-запит для отримання нотаток
-  app.get('/notes', async (req, res) => {
-    try {
-        const data = await fs.readFile('notes.json', 'utf8');
-        const notes = JSON.parse(data);
-        res.json(notes); // Повертаємо нотатки у форматі JSON
-    } catch (error) {
-        // Обробка помилки, якщо файл notes.json не існує або містить некоректний JSON
-        console.error('Помилка при отриманні нотаток:', error);
-        res.status(500).json([]);
-    }
+  app.get('/notes', (req, res) => {
+    res.json(notes);
 });
 
-app.get('/notes/:noteName', async (req, res) => {
-  const noteName = req.params.noteName; // отримує значення параметру
+app.get('/notes/:note_name', (req, res) => {
+  const note_name = req.params.note_name; // отримує значення параметру
 
-  if (noteName.trim() === '') { // Перевіряємо, чи не порожній параметр
-      res.status(400).send('Введіть назву нотатки.'); // Bad request
-      return;
-  }
-
-  try {
-      const data = await fs.readFile('notes.json', 'utf8'); 
-      const notes = JSON.parse(data); 
-      const note = notes.find((n) => n.note_name === noteName); // Знаходимо нотатку за назвою
+      const findnote = notes.find(note => note.note_name === note_name); // Знаходимо нотатку за назвою
       
-      if (note) {
-        res.send(note.note);
+      if (findnote) {
+        res.send({note_name: note_name, note: findnote.note});
       } else {
-        res.status(404).send('Not found'); 
+        res.status(404).send('німа'); 
       }
-    } catch (error) {
-        console.error('Помилка при читанні notes.json:', error);
-        res.status(500).send('Помилка сервера'); // Internal Server Error
-    }
-});
+    } );
 
 
 // Оновлений posT-запит для створення нотатки Notename
-app.post('/upload', async (req, res) => {
+app.post('/upload', (req, res) => {
   // Отримано дані з тіла запиту
-  const noteName = req.body.note_name; 
-  const noteText = req.body.note;
+  const note_name = req.body.note_name; 
+  const note = req.body.note;
 
-  try {
-    // Зчитуємо існуючі нотатки з файлу
-    const data = await fs.readFile('notes.json', 'utf8');
-    const notes = JSON.parse(data);
+  const exiting = notes.find(note => note.note_name === note_name);
 
-    if (notes.some((note) => note.note_name === noteName)) { // Перевіряємо, чи не існує нотатка з такою назвою
-      res.status(400).send('Така назва вже є');2
-    } else {
-      const newNote = { note_name: noteName, note: noteText }; // Створюється
-      notes.push(newNote); // Додаємо до масиву
-
-      // Зберігаємо оновлені нотатки у форматі JSON
-      await fs.writeFile('notes.json', JSON.stringify(notes), 'utf8'); // перетворенння обєкта в рядок і додавання у файл
-      res.status(201).send('Створено');
-    }
-  } catch (error) {
-    console.error('Помилка при завантаженні нотаток:', error);
-    res.status(500).send('Помилка сервера'); // Internal Server Error
+  if (exiting) {
+    res.status(400).send("Файл з такою назвою вже є");
+  } else{
+    notes.push({note_name: note_name, note: note});
+    res.status(201).send("Нотатка успішно створена");
   }
 });
 
 
-app.put('/notes/:noteName', async (req, res) => {
-  const noteName = req.params.noteName; // отримує дані з параметру
-  const noteText = req.body.note; // отримує дані з тіла запиту
-
-  if (noteName.trim() === '') { // Перевіряємо, чи не порожній параметр
-    res.status(400).send('Будь ласка, введіть назву нотатки.');
-    return;
-  }
-
-  try {
-      // Зчитуємо існуючі нотатки з файлу
-    const data = await fs.readFile('notes.json', 'utf8');
-    const notes = JSON.parse(data);
-    const noteIndex = notes.findIndex((n) => n.note_name === noteName); // визначає індекс нотатки за введеним іменем
+app.put('/notes/:note_name',(req, res) => {
+  const note_name = req.params.note_name; // отримує дані з параметру
+  const note = req.body.note; // отримує дані з тіла запиту
+    const noteIndex = notes.findIndex(note => note.note_name === note_name); // визначає індекс нотатки за введеним іменем
 
     if (noteIndex !== -1) { // Перевіряємо, чи існує нотатка з такою назвою
-      notes[noteIndex].note = noteText; // Оновлюємо нотатку
+      notes[noteIndex].note = note; // Оновлюємо нотатку
+      fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8')
+      res.json({note_name: note_name,note: notes[noteIndex].note});
+      res.status(200).send("Оновлено");
+      
+    }        
+    else { 
+      res.status(404).json("німа");}});
 
-      // Зберігаємо оновлені нотатки у форматі JSON
-      await fs.writeFile('notes.json', JSON.stringify(notes), 'utf8');
-      res.status(200).send('Все добре'); // ОК
-    } else {
-      res.status(404).send('Не знайдено'); 
-    }
-  } catch (error) {
-    console.error('Помилка при оновленні нотаток:', error);
-    res.status(500).send('Помилка сервера'); // Internal Server Error
-  }
-});
+app.delete('/notes/:note_name',(req, res) => {
+  const note_name = req.params.note_name; // отримує дані з параметру
 
-
-app.delete('/notes/:noteName', async (req, res) => {
-  const noteName = req.params.noteName; // отримує дані з параметру
-
-  try {
-    // Зчитуємо існуючі нотатки з файлу
-    const data = await fs.readFile('notes.json', 'utf8');
-    const notes = JSON.parse(data);
-    const noteIndex = notes.findIndex((n) => n.note_name === noteName); // визначає індекс нотатки за введеним іменем
+  const noteIndex = notes.findIndex(note => note.note_name === note_name); // визначає індекс нотатки за введеним іменем
 
     if (noteIndex !== -1) { // Перевіряємо, чи існує нотатка з такою назвою
       notes.splice(noteIndex, 1); // видалення цієї нотатки
 
       // Зберігаємо оновлені нотатки у форматі JSON
-      await fs.writeFile('notes.json', JSON.stringify(notes), 'utf8'); // перетворення обєкта в рядок і додавання у файл
+      fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8'); // перетворення обєкта в рядок і додавання у файл
       res.status(200).send('Все добре');
     } else {
-      res.status(404).send('Не знайдено');
+      res.status(404).send('німа');
     }
-  } catch (error) {
-    console.error('Помилка при видаленні нотатки:', error);
-    res.status(500).send('Помилка сервера'); // Internal Server Error
-  }
-});
+  } );
 
 app.listen(port, () => {
   console.log(`Сервер працює на порту ${port}`);
