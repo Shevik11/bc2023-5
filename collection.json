@@ -11,7 +11,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": "http://localhost:8000"
+				"url": "http://localhost:8000/UploadForm.html"
 			},
 			"response": []
 		},
@@ -20,7 +20,22 @@
 			"request": {
 				"method": "POST",
 				"header": [],
-				"url": "http://localhost:8000"
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "note_name",
+							"value": "4",
+							"type": "text"
+						},
+						{
+							"key": "note",
+							"value": "5",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8000/upload"
 			},
 			"response": []
 		},
@@ -29,7 +44,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
-				"url": "http://localhost:8000"
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "note",
+							"value": "7",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8000/notes/4"
 			},
 			"response": []
 		},
@@ -38,7 +63,7 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"url": "http://localhost:8000"
+				"url": "http://localhost:8000/notes/4"
 			},
 			"response": []
 		},
@@ -46,15 +71,24 @@
 			"name": "notes",
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": "http://localhost:8000/notes"
 			},
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "find note",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": "http://localhost:8000/notes/4"
 			},
 			"response": []
 		}
