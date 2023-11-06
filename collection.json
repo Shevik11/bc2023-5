@@ -7,15 +7,6 @@
 	},
 	"item": [
 		{
-			"name": "GET /notes",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": "http://localhost:8000"
-			},
-			"response": []
-		},
-		{
 			"name": "UploadForm.html",
 			"request": {
 				"method": "GET",
@@ -28,15 +19,6 @@
 			"name": "post/upload",
 			"request": {
 				"method": "POST",
-				"header": [],
-				"url": "http://localhost:8000"
-			},
-			"response": []
-		},
-		{
-			"name": "get/notes/mynotes",
-			"request": {
-				"method": "GET",
 				"header": [],
 				"url": "http://localhost:8000"
 			},
@@ -57,6 +39,22 @@
 				"method": "DELETE",
 				"header": [],
 				"url": "http://localhost:8000"
+			},
+			"response": []
+		},
+		{
+			"name": "notes",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
 			},
 			"response": []
 		}
