@@ -16,6 +16,15 @@
 			"response": []
 		},
 		{
+			"name": "notes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000/notes"
+			},
+			"response": []
+		},
+		{
 			"name": "post/upload",
 			"request": {
 				"method": "POST",
@@ -40,35 +49,7 @@
 			"response": []
 		},
 		{
-			"name": "put/notes/mynotes",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "note",
-							"value": "7",
-							"type": "text"
-						}
-					]
-				},
-				"url": "http://localhost:8000/notes/4"
-			},
-			"response": []
-		},
-		{
-			"name": "delete/notes/mynotes",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": "http://localhost:8000/notes/4"
-			},
-			"response": []
-		},
-		{
-			"name": "notes",
+			"name": "notes Copy",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -89,6 +70,52 @@
 					"raw": ""
 				},
 				"url": "http://localhost:8000/notes/4"
+			},
+			"response": []
+		},
+		{
+			"name": "put/notes/mynotes",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "note",
+							"value": "7",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8000/notes/4"
+			},
+			"response": []
+		},
+		{
+			"name": "notes Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000/notes"
+			},
+			"response": []
+		},
+		{
+			"name": "delete/notes/mynotes",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8000/notes/4"
+			},
+			"response": []
+		},
+		{
+			"name": "notes Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8000/notes"
 			},
 			"response": []
 		}
