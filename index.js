@@ -1,91 +1,83 @@
 const express = require('express');
 const fs = require('fs');
 const multer = require('multer');
+const upload = multer();
 const app = express();
 const port = 8000;
 
+app.use(multer().none());
+app.use(express.json());
+app.use(express.static('static'));
 
-app.use(multer().none()) // обробляє запити без вкладених файлів
-app.use(express.json()); // Для парсингу JSON
-app.use(express.static('static')); // Вказуємо, що файли з папки 'static' мають бути доступні
-
-// app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/static/UploadForm.html'); // Повертаємо файл UploadForm.html
-// });
 const notes = [];
+
 app.get('/', (req, res) => {
   res.send('Сервіс запущено. Вітаємо!');
 });
 
 app.get('/UploadForm.html', (req, res) => {
-  res.sendFile(__dirname + '/static/UploadForm.html'); // Повертаємо файл UploadForm.html
+  res.sendFile(__dirname + '/static/UploadForm.html');
 });
 
-  // Оновлений GET-запит для отримання нотаток
-  app.get('/notes', (req, res) => {
-    res.json(notes);
+app.get('/notes', (req, res) => {
+  res.json(notes);
 });
 
 app.get('/notes/:note_name', (req, res) => {
-  const note_name = req.params.note_name; // отримує значення параметру
+  const note_name = req.params.note_name;
+  const findnote = notes.find(note => note.note_name === note_name);
 
-      const findnote = notes.find(note => note.note_name === note_name); // Знаходимо нотатку за назвою
-      
-      if (findnote) {
-        res.send({note_name: note_name, note: findnote.note});
-      } else {
-        res.status(404).send('німа'); 
-      }
-    } );
-
-
-// Оновлений posT-запит для створення нотатки Notename
-app.post('/upload', (req, res) => {
-  // Отримано дані з тіла запиту
-  const note_name = req.body.note_name; 
-  const note = req.body.note;
-
-  const exiting = notes.find(note => note.note_name === note_name);
-
-  if (exiting) {
-    res.status(400).send("Файл з такою назвою вже є");
-  } else{
-    notes.push({note_name: note_name, note: note});
-    res.status(201).send("Нотатка успішно створена");
+  if (findnote) {
+    res.send({ note_name: note_name, note: findnote.note });
+  } else {
+    res.status(404).send('Not Found');
   }
 });
 
+app.post('/upload', (req, res) => {
+  const note_name = req.body.note_name;
+  const note = req.body.note;
 
-app.put('/notes/:note_name',(req, res) => {
-  const note_name = req.params.note_name; // отримує дані з параметру
-  const note = req.body.note; // отримує дані з тіла запиту
-    const noteIndex = notes.findIndex(note => note.note_name === note_name); // визначає індекс нотатки за введеним іменем
+  const existing = notes.find(note => note.note_name === note_name);
 
-    if (noteIndex !== -1) { // Перевіряємо, чи існує нотатка з такою назвою
-      notes[noteIndex].note = note; // Оновлюємо нотатку
-      fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8')
-      res.json({note_name: note_name,note: notes[noteIndex].note});
-      res.status(200).send("Оновлено");
-      
-    }        
-    else { 
-      res.status(404).json("німа");}});
+  if (existing) {
+    res.status(400).send("Bad Request");
+  } else {
+    notes.push({ note_name: note_name, note: note });
 
-app.delete('/notes/:note_name',(req, res) => {
-  const note_name = req.params.note_name; // отримує дані з параметру
+    // Зберігаємо оновлені нотатки у форматі JSON
+    fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8');
 
-  const noteIndex = notes.findIndex(note => note.note_name === note_name); // визначає індекс нотатки за введеним іменем
+    res.status(201).send("OK");
+  }
+});
 
-    if (noteIndex !== -1) { // Перевіряємо, чи існує нотатка з такою назвою
-      notes.splice(noteIndex, 1); // видалення цієї нотатки
+app.put('/notes/:note_name', (req, res) => {
+  const note_name = req.params.note_name;
+  const note = req.body.note;
+  const noteIndex = notes.findIndex(note => note.note_name === note_name);
 
-      // Зберігаємо оновлені нотатки у форматі JSON
-      fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8'); // перетворення обєкта в рядок і додавання у файл
-      res.status(200).send('Все добре');
-    } else {
-      res.status(404).send('німа');
-    }
-  } );
+  if (noteIndex !== -1) {
+    notes[noteIndex].note = note;
+    fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8');
+    res.status(200).send("OK");
+  } else {
+    res.status(404).json("Not Found");
+  }
+});
+
+app.delete('/notes/:note_name', (req, res) => {
+  const note_name = req.params.note_name;
+  const noteIndex = notes.findIndex(note => note.note_name === note_name);
+
+  if (noteIndex !== -1) {
+    notes.splice(noteIndex, 1);
+    fs.writeFileSync('notes.json', JSON.stringify(notes), 'utf8');
+    res.status(200).send('OK');
+  } else {
+    res.status(404).send('Not Found');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Сервер працює на порту ${port}`);
