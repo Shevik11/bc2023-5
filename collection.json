@@ -8,6 +8,17 @@
 	"item": [
 		{
 			"name": "UploadForm.html",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -26,6 +37,20 @@
 		},
 		{
 			"name": "post/upload",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -34,12 +59,12 @@
 					"formdata": [
 						{
 							"key": "note_name",
-							"value": "4",
+							"value": "note",
 							"type": "text"
 						},
 						{
 							"key": "note",
-							"value": "5",
+							"value": "dsnfhdsjbf",
 							"type": "text"
 						}
 					]
@@ -66,15 +91,18 @@
 				"method": "GET",
 				"header": [],
 				"body": {
-					"mode": "raw",
-					"raw": ""
+					"mode": "formdata",
+					"formdata": []
 				},
-				"url": "http://localhost:8000/notes/4"
+				"url": "http://localhost:8000/notes/note"
 			},
 			"response": []
 		},
 		{
 			"name": "put/notes/mynotes",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
 			"request": {
 				"method": "PUT",
 				"header": [],
@@ -83,12 +111,12 @@
 					"formdata": [
 						{
 							"key": "note",
-							"value": "7",
+							"value": "8",
 							"type": "text"
 						}
 					]
 				},
-				"url": "http://localhost:8000/notes/4"
+				"url": "http://localhost:8000/notes/note"
 			},
 			"response": []
 		},
@@ -106,7 +134,7 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"url": "http://localhost:8000/notes/4"
+				"url": "http://localhost:8000/notes/note"
 			},
 			"response": []
 		},
