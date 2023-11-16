@@ -59,7 +59,7 @@
 					"formdata": [
 						{
 							"key": "note_name",
-							"value": "note",
+							"value": "note2",
 							"type": "text"
 						},
 						{
@@ -74,7 +74,7 @@
 			"response": []
 		},
 		{
-			"name": "notes Copy",
+			"name": "notes",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -94,7 +94,7 @@
 					"mode": "formdata",
 					"formdata": []
 				},
-				"url": "http://localhost:8000/notes/note"
+				"url": "http://localhost:8000/notes/note2"
 			},
 			"response": []
 		},
@@ -107,21 +107,20 @@
 				"method": "PUT",
 				"header": [],
 				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "note",
-							"value": "8",
-							"type": "text"
+					"mode": "raw",
+					"raw": "new text",
+					"options": {
+						"raw": {
+							"language": "text"
 						}
-					]
+					}
 				},
-				"url": "http://localhost:8000/notes/note"
+				"url": "http://localhost:8000/notes/note2"
 			},
 			"response": []
 		},
 		{
-			"name": "notes Copy",
+			"name": "notes",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -134,12 +133,12 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
-				"url": "http://localhost:8000/notes/note"
+				"url": "http://localhost:8000/notes/note2"
 			},
 			"response": []
 		},
 		{
-			"name": "notes Copy",
+			"name": "notes",
 			"request": {
 				"method": "GET",
 				"header": [],
