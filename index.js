@@ -1,25 +1,29 @@
 const express = require('express');
 const fs = require('fs');
 const multer = require('multer');
-const upload = multer();
 const bodyParser = require("body-parser");
+
+
 const app = express();
 const port = 8000;
 
-app.use(multer().none()); 
-app.use(express.json());
-app.use(express.static('static'));
+app.use(multer().none()); // лише текстових даних
+app.use(express.json()); // автоматичного розпакування JSON-даних у тілі запиту
+app.use(express.static('static')); //використовувати файли з папки static
+app.use(bodyParser.raw({ type: 'text/plain' }));
 
-var filename = 'notes.json';
+let filename = 'notes.json';
 
 if (!fs.existsSync(filename)) {
   // Якщо файл не існує, створюємо його з порожнім масивом
   fs.writeFileSync(filename, '[]', 'utf8');
 }
 
-app.use(bodyParser.raw({ type: 'text/plain' }));
-
 const notes = JSON.parse(fs.readFileSync(filename, 'utf8'));
+
+function writefile() {
+  fs.writeFileSync(filename, JSON.stringify(notes), 'utf8');
+}
 
 app.get('/', (req, res) => {
   res.send('Сервіс запущено. Вітаємо!');
@@ -55,7 +59,7 @@ app.post('/upload', (req, res) => {
     notes.push({ note_name: note_name, note: note });
 
     // Зберігаємо оновлені нотатки у форматі JSON
-    fs.writeFileSync(filename, JSON.stringify(notes), 'utf8');
+  writefile();
 
     console.log('Поточний стан notes:', notes);
 
@@ -83,7 +87,7 @@ app.delete('/notes/:note_name', (req, res) => {
 
   if (noteIndex !== -1) {
     notes.splice(noteIndex, 1);
-    fs.writeFileSync(filename, JSON.stringify(notes), 'utf8');
+    writefile()
     res.status(200).send('OK');
   } else {
     res.status(404).send('Not Found');
