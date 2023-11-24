@@ -42,7 +42,7 @@ app.get('/notes/:note_name', (req, res) => {
   const findnote = notes.find(note => note.note_name === note_name);
 
   if (findnote) {
-    res.send({findnote.note });
+    res.send(findnote.note);
   } else {
     res.status(404).send('Not Found');
   }
